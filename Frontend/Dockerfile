@@ -1,30 +1,16 @@
-# ---------- Build Stage ----------
 FROM node:18-alpine
 
 WORKDIR /app
 
+# Install dependencies
 COPY package*.json ./
 RUN npm install
 
+# Copy source code
 COPY . .
-RUN npm run build
 
-# ---------- Runtime Stage ----------
-FROM nginx:alpine
+# Expose React dev server port
+EXPOSE 3000
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=0 /app/build /usr/share/nginx/html
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-
-
-# Remove default nginx static files
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy build output
-COPY --from=0 /app/build /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start React
+CMD ["npm", "start"]
